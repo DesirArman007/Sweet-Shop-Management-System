@@ -8,6 +8,7 @@ import com.pm.sweetshopmanagementsystem.mapper.SweetMapper;
 import com.pm.sweetshopmanagementsystem.repositories.SweetRepository;
 import com.pm.sweetshopmanagementsystem.services.SweetService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -94,6 +95,38 @@ public class SweetServiceImpl implements SweetService {
         Sweet sweet = sweetRepository.findById(sweetId)
                         .orElseThrow( () -> new RuntimeException("Sweet not found") );
          sweetRepository.delete(sweet);
+    }
+
+    @Override
+    @Transactional
+    public SweetResponseDTO purchaseSweet(UUID sweetId, int quantity) {
+
+        Sweet sweet = sweetRepository.findById(sweetId)
+                .orElseThrow(() -> new RuntimeException("Sweet not found"));
+
+        if (sweet.getQuantity() < quantity) {
+            throw new IllegalStateException("Insufficient stock available");
+        }
+
+        sweet.setQuantity(sweet.getQuantity() - quantity);
+
+        sweetRepository.save(sweet);
+
+        return sweetMapper.toDto(sweet);
+    }
+
+    @Override
+    @Transactional
+    public SweetResponseDTO restockSweet(UUID sweetId, int quantity) {
+
+        Sweet sweet = sweetRepository.findById(sweetId)
+                .orElseThrow(() -> new RuntimeException("Sweet not found"));
+
+        sweet.setQuantity(sweet.getQuantity() + quantity);
+
+        sweetRepository.save(sweet);
+
+        return sweetMapper.toDto(sweet);
     }
 
 

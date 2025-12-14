@@ -21,8 +21,13 @@ public interface SweetService {
             BigDecimal maxPrice
     );
 
-    SweetResponseDTO updateSweet(UUID Id, SweetUpdateRequestDTO requestDTO);
+    SweetResponseDTO updateSweet(UUID sweetId, SweetUpdateRequestDTO requestDTO);
 
     void deleteSweet(UUID sweetId);
+
+    SweetResponseDTO purchaseSweet(UUID sweetId, int quantity);
+
+    SweetResponseDTO restockSweet(UUID sweetId, int quantity);
+
 
 }
