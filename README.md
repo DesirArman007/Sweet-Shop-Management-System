@@ -1,111 +1,161 @@
-# Sweet-Shop-Management-System
 
+# 🍬 Sweet Shop Management System
 
-The Sweet Shop Management System is a backend REST API built using Spring Boot to manage sweets, users, and inventory operations for a sweet shop.
-The application follows REST principles, implements JWT-based authentication, role-based authorization, and uses PostgreSQL as the database.
-The project is fully Dockerized and deployed on Render.
+> A robust backend REST API built using Spring Boot to manage sweets, users, and inventory operations.
 
-Features
+The **Sweet Shop Management System** is a backend application designed to streamline operations for a sweet shop. It follows **REST principles**, implements secure **JWT-based authentication**, enforces **role-based authorization**, and utilizes **PostgreSQL** for data persistence. The project is fully containerized using **Docker** and deployed on **Render**.
 
-User registration and login
-JWT-based authentication
-Role-based authorization (USER, ADMIN)
-Sweet management (create, update, delete, search)
-Inventory management (purchase and restock)
-Secure API endpoints
-PostgreSQL database integration
-Docker containerization
-Environment-based configuration
-RESTful API design
+-----
 
-Tech Stack
+## 🚀 Features
 
-Language: Java 17
-Framework: Spring Boot 3
-Security: Spring Security, JWT
-ORM: Spring Data JPA (Hibernate)
-Database: PostgreSQL
-Build Tool: Maven
-Containerization: Docker
+  * **User Management:** Secure user registration and login.
+  * **Security:** JWT-based authentication (Stateless) & Role-based authorization (`USER`, `ADMIN`).
+  * **Sweet Catalog:** Create, update, delete, and search for sweets.
+  * **Inventory Control:** Manage stock levels through purchase and restock workflows.
+  * **Database:** Persistent storage using PostgreSQL.
+  * **DevOps:** Docker containerization and environment-based configuration.
+  * **Design:** Clean RESTful API architecture.
 
-Project Structure
+-----
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+| :--- | :--- |
+| **Language** | Java 17 |
+| **Framework** | Spring Boot 3 |
+| **Security** | Spring Security, JWT |
+| **Database** | PostgreSQL |
+| **ORM** | Spring Data JPA (Hibernate) |
+| **Build Tool** | Maven |
+| **Containerization** | Docker |
+| **Deployment** | Render |
+
+-----
+
+## 📂 Project Structure
+
+```text
 src/main/java
- ├── controller
- ├── service
- ├── repositories
- ├── entities
- ├── dto
- └── config
+ ├── config          # Security & App configuration
+ ├── controller      # REST API endpoints
+ ├── dto             # Data Transfer Objects
+ ├── entities        # JPA Entities (Database models)
+ ├── repositories    # Data Access Layer
+ └── service         # Business Logic
+```
 
-Environment Variables - The application uses environment variables for configuration and security.
+-----
 
+## ⚙️ Configuration
+
+The application uses environment variables for security and database connection. You must configure these in your local `.env` file or your deployment platform variables.
+
+```properties
+# Database Configuration
 DB_URL=jdbc:postgresql://<hostname>:5432/<database_name>
 DB_USERNAME=<database_username>
 DB_PASSWORD=<database_password>
 
-JWT_SECRET_KEY=<your_jwt_secret>
-JWT_EXPIRATION=<expiration_time_in_ms>
-JWT_REFRESH_EXPIRATION=<refresh_expiration_time_in_ms>
+# JWT Security Configuration
+JWT_SECRET_KEY=<your_secure_jwt_secret>
+JWT_EXPIRATION=86400000        # e.g., 24 hours in ms
+JWT_REFRESH_EXPIRATION=604800000 # e.g., 7 days in ms
+```
 
-Running the Application Locally
-Using Maven
+-----
+
+## 🏃‍♂️ Running the Application Locally
+
+### Prerequisites
+
+  * Java 17+
+  * Maven
+  * Docker (Optional)
+
+### Option 1: Using Maven
+
+```bash
+# Clean and package the application
 mvn clean package
+
+# Run the application
 mvn spring-boot:run
+```
 
-Using Docker
+### Option 2: Using Docker
+
+```bash
+# Build the Docker image
 docker build -t sweet-shop .
+
+# Run the container (Mapping port 8080 to 8081)
 docker run -p 8081:8080 sweet-shop
+```
 
+The application will be accessible at: `http://localhost:8080` (or `8081` if using Docker command above).
 
-The application will be available at:
+-----
 
-http://localhost:8080
+## 🔌 API Overview
 
-API Overview
+All protected endpoints require a valid **Bearer Token** in the `Authorization` header.
 
-Auth APIs
-Register user
-Login user (JWT token generation)
-Sweet APIs
-Create sweet
-Update sweet
-Delete sweet (Admin only)
-Search sweets
-Inventory APIs
-Purchase sweet
-Restock sweet (Admin only)
+### 🔐 Auth APIs
 
-All protected endpoints require a valid JWT token.
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register a new user | Public |
+| `POST` | `/api/auth/login` | Login & generate JWT | Public |
 
+### 🍭 Sweet APIs
 
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/sweets` | Create a new sweet | Admin |
+| `PUT` | `/api/sweets/{id}` | Update sweet details | Admin |
+| `DELETE` | `/api/sweets/{id}` | Delete a sweet | Admin |
+| `GET` | `/api/sweets/search` | Search sweets | Public/User |
 
-Environment variables are configured through Render’s dashboard.
+### 📦 Inventory APIs
 
-My AI Usage
-AI Tools Used
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/inventory/purchase` | Purchase sweet (reduce stock) | User |
+| `POST` | `/api/inventory/restock` | Restock sweet (increase stock) | Admin |
 
-ChatGPT
+-----
 
-How I Used AI
+## 🤖 AI Usage Disclosure
 
-Used ChatGPT to quickly refactor and rename API endpoints for consistency.
-Used ChatGPT to assist in debugging errors related to Spring Boot, Hibernate, Docker, and Render deployment.
-Used ChatGPT to validate business logic for inventory operations such as purchasing and restocking sweets.
-Used ChatGPT as a learning and clarification tool to understand error logs and configuration issues.
+Transparency regarding the use of AI tools in this project.
 
-What AI Did Not Do
+**AI Tools Used:** ChatGPT
 
-AI did not design the overall system architecture.
-AI did not write the entire project code.
-All AI-generated suggestions were reviewed, modified, and manually implemented.
-Reflection on AI Impact
+**How AI Was Used:**
 
-AI helped improve development speed and reduced debugging time by providing quick explanations and suggestions.
-It acted as a support tool, not a replacement for understanding or implementing the project.
-The core logic, structure, and final implementation remain my own.
+1.  **Refactoring:** Quickly refactored and renamed API endpoints to ensure RESTful consistency.
+2.  **Debugging:** Assisted in troubleshooting specific errors related to Spring Boot configurations, Hibernate mappings, and Docker deployment on Render.
+3.  **Validation:** Used to validate the logic flow for inventory operations (purchasing vs. restocking).
+4.  **Learning:** Served as a clarification tool to better understand specific error logs.
 
-Author
+**What AI Did Not Do:**
 
-Abhishek
-Backend Developer
-Java | Spring Boot | Docker | PostgreSQL
+  * AI did **not** design the system architecture.
+  * AI did **not** write the core project code from scratch.
+  * All suggestions were manually reviewed, tested, and implemented by the author.
+
+**Reflection:**
+
+> AI significantly improved development speed and reduced debugging time. However, it acted solely as a support tool. The core logic, structure, and final implementation remain the work of the author.
+
+-----
+
+## 👨‍💻 Author
+
+**Abhishek**
+*Backend Developer*
+
+  * **Skills:** Java, Spring Boot, Docker, PostgreSQL
+  * **Focus:** Building scalable and secure backend systems.
