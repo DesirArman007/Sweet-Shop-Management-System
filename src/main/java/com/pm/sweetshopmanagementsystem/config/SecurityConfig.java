@@ -3,15 +3,22 @@ package com.pm.sweetshopmanagementsystem.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@EnableMethodSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -23,9 +30,42 @@ public class SecurityConfig {
             PasswordEncoder passwordEncoder
     ){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsPasswordService((UserDetailsPasswordService) userDetailsService);
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
+    }
+
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+
+                        // AUTH (PUBLIC)
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+
+                        // SWEETS (AUTHENTICATED)
+                        .requestMatchers(HttpMethod.POST, "/api/sweets").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/sweets/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/sweets").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/sweets/search").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/sweets/*/purchase").authenticated()
+
+                        // ADMIN ONLY
+                        .requestMatchers(HttpMethod.DELETE, "/api/sweets/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/sweets/*/restock").hasRole("ADMIN")
+
+                        // ANYTHING ELSE
+                        .anyRequest().authenticated()
+                )
+
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean
