@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     @Override
-    public CreatedUserResponseDTO RegisterUser(RegisterRequestDTO registerRequestDTO) {
+    public CreatedUserResponseDTO registerUser(RegisterRequestDTO registerRequestDTO) {
         userRepository.findByEmail(registerRequestDTO.getEmail()).ifPresent(user ->{
             throw new IllegalStateException("User with email " + registerRequestDTO.getEmail() + " already exists.");
         });
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponseDTO LoginUser(LoginRequestDTO loginRequestDTO) {
+    public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

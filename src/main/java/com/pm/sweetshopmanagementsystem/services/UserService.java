@@ -8,8 +8,8 @@ import com.pm.sweetshopmanagementsystem.domain.dtos.RegisterRequestDTO;
 
 public interface UserService {
 
-    CreatedUserResponseDTO RegisterUser(RegisterRequestDTO registerRequestDTO);
+    CreatedUserResponseDTO registerUser(RegisterRequestDTO registerRequestDTO);
 
-    LoginResponseDTO LoginUser(LoginRequestDTO loginRequestDTO);
+    LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO);
 
 }
