@@ -1,14 +1,15 @@
 package com.pm.sweetshopmanagementsystem.domain.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 
+@Data
+@Builder
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
 public class SweetResponseDTO {
 
     private UUID id;

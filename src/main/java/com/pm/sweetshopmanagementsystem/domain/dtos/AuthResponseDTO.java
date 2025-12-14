@@ -1,10 +1,15 @@
 package com.pm.sweetshopmanagementsystem.domain.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
+
 public class AuthResponseDTO {
     private String token;
 }

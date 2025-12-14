@@ -14,14 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "sweets")
+@Table(name = "sweets" ,
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"name", "category"})
+        })
 public class Sweet {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
