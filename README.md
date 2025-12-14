@@ -39,11 +39,13 @@ The **Sweet Shop Management System** is a backend application designed to stream
 ```text
 src/main/java
  ├── config          # Security & App configuration
- ├── controller      # REST API endpoints
- ├── dto             # Data Transfer Objects
- ├── entities        # JPA Entities (Database models)
- ├── repositories    # Data Access Layer
- └── service         # Business Logic
+ ├── controllers     # REST API endpoints (Controllers)
+ ├── domain          # JPA Entities & Domain Models
+ ├── enums           # Enumerations (Roles, Status, etc.)
+ ├── mapper          # Entity-DTO Mappers (MapStruct)
+ ├── repositories    # Data Access Layer (JPA Repositories)
+ ├── services        # Business Logic & Service Implementation
+ └── SweetShopManagementSystemApplication.java  # Main Entry Point
 ```
 
 -----
