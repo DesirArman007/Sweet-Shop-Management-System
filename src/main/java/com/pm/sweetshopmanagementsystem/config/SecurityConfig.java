@@ -11,12 +11,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @EnableMethodSecurity
 @Configuration
@@ -26,31 +29,33 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     @Bean
-    public AuthenticationProvider authenticationProvider(
-            PasswordEncoder passwordEncoder
-    ){
+    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
 
+        http
+                // 1. ENABLE CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .authorizeHttpRequests(auth -> auth
                         // AUTH (PUBLIC)
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
 
-                        // SWEETS (AUTHENTICATED)
+                        // SWEETS - VIEWING (NOW PUBLIC)
+                        .requestMatchers(HttpMethod.GET, "/api/sweets").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sweets/search").permitAll()
+
+                        // SWEETS - ACTIONS (AUTHENTICATED)
                         .requestMatchers(HttpMethod.POST, "/api/sweets").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/sweets/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/sweets").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/sweets/search").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/sweets/*/purchase").authenticated()
 
                         // ADMIN ONLY
@@ -60,12 +65,35 @@ public class SecurityConfig {
                         // ANYTHING ELSE
                         .anyRequest().authenticated()
                 )
-
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    // 2. DEFINE CORS CONFIGURATION
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Allow the React Frontend
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        // Allow standard HTTP methods
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow all headers (needed for JWT Authorization header)
+        config.setAllowedHeaders(List.of("*"));
+
+        // Allow credentials (cookies/auth headers)
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
@@ -74,10 +102,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config
-    ) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }
